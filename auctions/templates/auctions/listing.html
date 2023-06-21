@@ -1,0 +1,46 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+
+    <div class="container d-flex justify-content-center align-items-start">
+        <div class="card text-center"  style="width: 50rem;">
+            <div class="card text-center " >
+          <div class="card-body">
+            <h1>{{item.title}}</h1>
+            <img src="{{item.image}}" alt="Image 1" class="img-fluid">
+            <p>Description : {{item.description}}</p>
+            <p>Category : {{item.category}}</p>
+            <p>Current Bid : {{item.current_bid}}</p>
+            <p>Seller : {{item.seller}}</p>
+            {% for commen in comments%}
+              <p>{{ commen.user_comm }} : {{ commen.comment}}</p>
+            {% endfor %}
+            {% if user.is_authenticated %}
+            <form action="{% url 'listing' item.id %}" method="post">
+              {% csrf_token %}
+              <div>
+                <textarea name="comment" id="comment" rows="4" cols="50"></textarea>
+                <input type="submit" value="Submit">
+              </div>
+              <div>
+                <input type="number" name="bid" placeholder="Place Bid">
+                <input type="submit">
+              </div>
+              <div>
+                {% if watchlists.state %}
+                  <input type="hidden" name="watchlist" value="False">
+                  <button type="submit">Remove from Watchlist</button>
+                {% else %}
+                  <input type="hidden" name="watchlist" value="True">
+                  <button type="submit">Add to Watchlist</button>
+                {% endif %}
+
+              </div>
+            </form> 
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+{% endblock %}

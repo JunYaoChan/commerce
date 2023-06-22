@@ -2,18 +2,28 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-
-    {% for auction in listings %}
-    <div class="container">
-        <div class="row justify-content-center align-items-center">
-        <div class="card" style="width: 18rem;">
-            <div class="card card-cascade" >
+    <style>
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .card {
+            width: 18rem;
+            margin-right: 20px; /* Adjust the margin as needed */
+        }
+    </style>
+    
+    <div class="card-container">
+        {% for auction in listings %}
+        <div class="card">
+            <div class="card card-cascade">
                 <!-- Card image -->
-                    <img src="{{ auction.image }}" alt="Image of {{ auction.title }}"class="card-img-top"></a>
-                    <a>
-                        <div class="mask rgba-white-slight"></div>
-                    </a>
-                </div>
+                <img src="{{ auction.image }}" alt="Image of {{ auction.title }}" style="width: 100%; height: 100%;">
+                <a>
+                    <div class="mask rgba-white-slight"></div>
+                </a>
+            </div>
             <div class="card-body">
                 <h5 class="card-title">{{ auction.title }}</h5>
                 <p class="card-text">Current Price: {{ auction.current_bid }}</p>
@@ -21,5 +31,7 @@
                 <a href="{% url 'listing' auction.id %}" class="btn btn-primary">View Listing</a>
             </div>
         </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
+    
 {% endblock %}

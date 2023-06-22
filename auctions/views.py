@@ -4,9 +4,9 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-
+from django.utils.datastructures import MultiValueDictKeyError
 from .models import Listing, User,Bid,Comment,Watchlist
-
+from django.shortcuts import redirect
 
 def index(request):
     return render(request, "auctions/index.html",{
@@ -66,9 +66,15 @@ def register(request):
         return render(request, "auctions/register.html")
 
 def listing(request,id):
-    watchlist = ""
+    watchlist = None
     if request.method == "POST":
-        
+        try:
+            username = request.POST["username"]
+            if username is not None:
+                watchlist = Watchlist.objects.get(listing=Listing.objects.get(id=id))
+        except MultiValueDictKeyError:
+            pass
+
         # Check whether the field is empty 
         if "bid" in request.POST and request.POST["bid"]:
             if Decimal(request.POST["bid"]) <= Listing.objects.get(id=id).current_bid:
@@ -90,13 +96,15 @@ def listing(request,id):
             comment.save()
         if "watchlist" in request.POST and request.POST["watchlist"]:
             if request.POST["watchlist"] == "True":
-                Watchlist.objects.get(user=request.user).delete()
-                watchlist = Watchlist.objects.create(user = request.user,listing=Listing.objects.get(id=id),state=True)
-                watchlist.save()
+                watch = Watchlist.objects.get(listing=Listing.objects.get(id=id))
+                watch.state = True
+                watch.save()
             else:
-                Watchlist.objects.get(user=request.user).delete()
-        if request.POST["username"] is not None:
-            watchlist = Watchlist.objects.get(user=request.user)
+                watch = Watchlist.objects.get(listing=Listing.objects.get(id=id))
+                watch.state = False
+                watch.save()
+                return redirect("listing", id=id)
+
 
 
     return render(request, "auctions/listing.html",{
